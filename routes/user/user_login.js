@@ -1,7 +1,12 @@
+// // POST to login user
 import express from "express";
-const router = express.Router()
-// POST to login user
-router.post("/", async (req, res) => {
+import bcrypt from "bcrypt";
+
+import userModel from "../../model/userModel.js";
+
+const router = express.Router();
+
+router.route("/login").post(async (req, res) => {
   try {
     const { email, password } = req.body;
 

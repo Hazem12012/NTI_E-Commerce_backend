@@ -1,98 +1,15 @@
-// import express from "express";
-// const app = express();
-// app.use(express.json()); // to receive the json data
-
-// const users = [];
-// app.get("/", (req, res) => {
-//   res.send("Home");
-// });
-
-// app.get("/users", (req, res) => {
-//   if (users.length == 0) {
-//     res.status(404).send("Users not found !");
-//     return;
-//   } else {
-//     res.status(200).send(users);
-//   }
-// });
-
-// app.post("/users", (req, res) => {
-//   res.send("Create!");
-//   users.push(req.body);
-//   console.log(req.body);
-// });
-
-// app.listen(3000, () => {
-//   console.log("server runing");
-// });
-// const express = require("express");  =>  this is the old syntax
-
-// import express from "express";
-// import bcrypt from "bcrypt";
-
-// const app = express();
-// const port = 3000;
-// const users = [];
-
-// app.use(express.json());
-// app.get("/users", (req, res) => {
-//   res.json(users);
-// });
-
-// app.post("/register", async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     const findUser = users.find((data) => email == data.email);
-//     if (findUser) {
-//       res
-//         .status(400)
-//         .json({ error: "the user name and password con't be used !" });
-//       return;
-//     }
-//     const hashedPassword = await bcrypt.hash(password, 8);
-//     users.push({ email, password: hashedPassword });
-//     console.log(users);
-//     res.status(201).json(req.body);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// });
-
-// app.post("/login", async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     const findUser = users.find((data) => data.email === email);
-//     if (!findUser) {
-//        return res
-//         .status(400)
-//         .json({ message: "This email and password do not match !" });
-
-//     }
-
-//     const matchPassword = await bcrypt.compare(password, findUser.password);
-//     if (matchPassword) {
-//     return res.status(302).json({ message: "Login is success" });
-//     } else {
-//       return res
-//         .status(400)
-//         .json({ message: "This email and password do not match !" });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// });
-
-// app.listen(port, () => {
-//   console.log("server is runing");
-// });
-
 import express from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
-const port = 3000;
+// import the route files
+import userRoute from "./routes/user/user_get_data.js";
+import userLogin from "./routes/user/user_login.js";
+import userRegister from "./routes/user/user_register.js";
 
 const app = express();
+const port = 3000;
+
 app.use(express.json());
 
 mongoose
@@ -100,28 +17,57 @@ mongoose
   .then(() => console.log("mongo is connected"))
   .catch((error) => console.log(error)); // return promise
 
-const userSchema = new mongoose.Schema({
-  userName: String,
-  age: Number,
-  password: String,
-  email: String,
-});
+// use route  files
+app.use("/user", userRoute, userLogin, userRegister);
+// app.use("/user/login", userRoute);
 
-const userModel = mongoose.model("User", userSchema);
+// GET to represent the users
 
-const register = require("./routes/register");
-const login = require("./routes/login");
-const get = require("./routes/get");
-const deleteUser = require("./routes/delete");
-const update = require("./routes/update");
+// app.get("/admin", async (req, res) => {
+//   try {
+//     // const findUser = await userModel.findById(req.params.id);
+//     const users = await userModel.find();
+//     // if (!findUser) {
+//     //   res.status(404).json({ mesage: "user not found" });
+//     // } else {
+//     // }
+//     res.status(200).json({ message: "All users", users });
+//   } catch (error) {
+//     return res.status(500).json({ error: error.message });
+//   }
+// });
 
+// // PUT to update the user data
+// app.put("/user/:id", express.json(), async (req, res) => {
+//   const { id } = req.params;
 
-app.use("/register", register);
-app.use("/login", login);
-app.use("/get", get);
-app.use("/delete", deleteUser);
-app.use("/update", update);
+//   try {
+//     const exsist = await userModel.findOne({ _id: req.params.id });
+//     if (!exsist) {
+//       return res.json({ message: "this id is not correct " });
+//     }
+//     const updateUser = await userModel.findByIdAndUpdate(
+//       req.params.id,
+//       { ...req.body },
+//       { returnDocument: "after" }
+//     );
+//     res.status(200).json({ message: "Updated successfully", updateUser });
+//   } catch (error) {
+//     res.status(404).json({ error: error.message });
+//   }
+// });
 
+// // delete user
+// app.delete("/user/:id", express.json(), async (req, res) => {
+//   try {
+//     const deleteUser = await userModel.findByIdAndDelete(req.params.id);
+//     return res
+//       .status(200)
+//       .json({ message: "Deleted  successfully", deleteUser });
+//   } catch (error) {
+//     return res.status(404).json({ error: "failed  to delete" });
+//   }
+// });
 
 app.listen(port, () => {
   console.log("server stated");
