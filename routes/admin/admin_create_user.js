@@ -1,7 +1,6 @@
-// // POST to register user
+// // POST to login user
 import express from "express";
 import bcrypt from "bcrypt";
-
 import userModel from "../../model/userModel.js";
 const router = express.Router();
 
